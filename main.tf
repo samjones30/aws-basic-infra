@@ -88,8 +88,8 @@ locals {
         rule_number = 900
         rule_action = "allow"
         from_port   = 0
-        to_port     = 65535
-        protocol    = "tcp"
+        to_port     = 0
+        protocol    = "-1"
         cidr_block  = "0.0.0.0/0"
       },
     ]
