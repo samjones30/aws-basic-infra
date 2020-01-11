@@ -23,7 +23,7 @@ variable "aws_key_name" {
   default = "management-key"
 }
 
-variable "ec2__web_instances" {
+variable "ec2_web_instances" {
   default = "2"
 }
 
