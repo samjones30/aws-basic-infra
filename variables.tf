@@ -19,7 +19,7 @@ variable "cidr_internet" {
   default = "0.0.0.0/0"
 }
 
-variable "aws_key_name-jenkins" {
+variable "aws_key_name-mgmt" {
   default = "jenkins"
 }
 
