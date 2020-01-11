@@ -136,7 +136,7 @@ module "ec2_mgmt" {
 
   ami                    = "${data.aws_ami.aws_linux_ami.id}"
   instance_type          = "t3.medium"
-  key_name               = "${var.aws_key_name}"
+  key_name               = "${var.aws_key_name-mgmt}"
   monitoring             = true
   vpc_security_group_ids = ["${aws_security_group.mgmt-sg.id}"]
   subnet_ids              = "${module.vpc.public_subnets}"
@@ -191,7 +191,7 @@ module "ec2_cluster" {
 
   ami                    = "${data.aws_ami.aws_linux_ami.id}"
   instance_type          = "t2.micro"
-  key_name               = "${var.aws_key_name}"
+  key_name               = "${var.aws_key_name-servers}"
   monitoring             = true
   vpc_security_group_ids = ["${aws_security_group.web-sg.id}"]
   subnet_ids              = "${module.vpc.public_subnets}"
