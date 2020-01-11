@@ -270,7 +270,7 @@ module "elb_http" {
   }
 
   // ELB attachments
-  number_of_instances = "${var.ec2_instances}"
+  number_of_instances = "${var.ec2_web_instances}"
   instances           = module.ec2_cluster.id
 
   tags = {

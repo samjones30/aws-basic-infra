@@ -1,7 +1,7 @@
 
 output "public_dns_webs" {
   description = "List of public DNS names assigned to the web instances. For EC2-VPC, this is only available if you've enabled DNS hostnames for your VPC"
-  value       = module.ec2_web_cluster.*.public_dns
+  value       = module.ec2_cluster.*.public_dns
 }
 
 output "public_dns_mgmt" {
@@ -11,7 +11,7 @@ output "public_dns_mgmt" {
 
 output "public_ip_webs" {
   description = "List of public IP addresses assigned to the web instances, if applicable"
-  value       = module.ec2_web_cluster.*.public_ip
+  value       = module.ec2_cluster.*.public_ip
 }
 
 output "public_ip_mgmt" {
@@ -21,7 +21,7 @@ output "public_ip_mgmt" {
 
 output "private_ip_webs" {
   description = "List of private IP addresses assigned to the web instances"
-  value       = module.ec2_web_cluster.*.private_ip
+  value       = module.ec2_cluster.*.private_ip
 }
 
 output "private_ip_mgmt" {
