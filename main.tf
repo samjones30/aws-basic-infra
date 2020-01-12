@@ -117,6 +117,14 @@ locals {
         to_port     = 22
         protocol    = "tcp"
         cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 130
+        rule_action = "allow"
+        from_port   = 1024
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
       }
     ]
   }
@@ -127,6 +135,22 @@ locals {
 ###Create EC2 Servers###
 ########################
 
+data "template_file" "script" {
+  template = "${file(scripts/cloud_init.tpl")}"
+}
+
+data "template_cloudinit_config" "config" {
+  gzip          = true
+  base64_encode = true
+
+  # Main cloud-config configuration file.
+  part {
+    filename     = "init.cfg"
+    content_type = "text/cloud-config"
+    content      = "${data.template_file.script.rendered}"
+  }
+}
+
 module "ec2_mgmt" {
   source                 = "terraform-aws-modules/ec2-instance/aws"
   version                = "~> 2.0"
@@ -135,17 +159,21 @@ module "ec2_mgmt" {
   instance_count         = "${var.ec2_mgmt_instances}"
 
   ami                    = "${data.aws_ami.aws_linux_ami.id}"
-  instance_type          = "t3.medium"
+  instance_type          = "${var.ec2_mgmt_instance_type}"
   key_name               = "${var.aws_key_name-mgmt}"
   monitoring             = true
   vpc_security_group_ids = ["${aws_security_group.mgmt-sg.id}"]
-  subnet_ids              = "${module.vpc.public_subnets}"
+  subnet_ids             = "${module.vpc.public_subnets}"
+
+  uder_data_base64       = "${data.template_cloudinit_config.config.rendered}"
 
   tags = {
     Terraform   = "true"
     Environment = "dev"
   }
 }
+
+
 
 resource "aws_security_group" "mgmt-sg" {
   name        = "mgmt-server-sg"
@@ -190,7 +218,7 @@ module "ec2_cluster" {
   instance_count         = "${var.ec2_web_instances}"
 
   ami                    = "${data.aws_ami.aws_linux_ami.id}"
-  instance_type          = "t2.micro"
+  instance_type          = "${var.ec2_mgmt_instance_type}"
   key_name               = "${var.aws_key_name-servers}"
   monitoring             = true
   vpc_security_group_ids = ["${aws_security_group.web-sg.id}"]

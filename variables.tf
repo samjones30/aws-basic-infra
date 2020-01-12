@@ -28,9 +28,17 @@ variable "aws_key_name-servers" {
 }
 
 variable "ec2_web_instances" {
-  default = "2"
+  default = "1"
 }
 
 variable "ec2_mgmt_instances" {
   default = "1"
+}
+
+variable "ec2_web_instance_type" {
+  default = "t2.micro"
+}
+
+variable "ec2_mgmt_instance_type" {
+  default = "t2.micro"
 }
