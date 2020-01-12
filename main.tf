@@ -193,7 +193,7 @@ resource "aws_iam_policy" "mgmt_policy" {
   "Statement": [
     {
       "Action": [
-        "ec2:Describe*",
+        "ec2:Describe*"
       ],
       "Effect": "Allow",
       "Resource": "*"
