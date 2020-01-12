@@ -162,11 +162,6 @@ module "ec2_mgmt" {
   }
 }
 
-resource "aws_iam_instance_profile" "mgmt_role_profile" {
-  name = "mgmt_role_profile"
-  role = "${aws_iam_role.mgmt_role.name}"
-}
-
 ##IAM role for MGMT servers
 resource "aws_iam_role" "mgmt_role" {
   name = "mgmt_role"
@@ -188,9 +183,9 @@ resource "aws_iam_role" "mgmt_role" {
 EOF
 }
 
-resource "aws_iam_instance_profile" "test_profile" {
-  name = "test_profile"
-  role = "${aws_iam_role.role.name}"
+resource "aws_iam_instance_profile" "mgmt_role_profile" {
+  name = "mgmt_role_profile"
+  role = "${aws_iam_role.mgmt_role.name}"
 }
 
 resource "aws_security_group" "mgmt-sg" {
