@@ -183,10 +183,37 @@ resource "aws_iam_role" "mgmt_role" {
 EOF
 }
 
+resource "aws_iam_policy" "mgmt_policy" {
+  name        = "mgmt-policy"
+  description = "Policy to allow mgmt server to find information about the deployment"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ec2:Describe*",
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "test-attach" {
+  role       = "${aws_iam_role.mgmt_role.name}"
+  policy_arn = "${aws_iam_policy.mgmt_policy.arn}"
+}
+
 resource "aws_iam_instance_profile" "mgmt_role_profile" {
   name = "mgmt_role_profile"
-  role = "${aws_iam_role.mgmt_role.name}"
+  role = aws_iam_role.mgmt_role.name
 }
+
+
 
 resource "aws_security_group" "mgmt-sg" {
   name        = "mgmt-server-sg"
