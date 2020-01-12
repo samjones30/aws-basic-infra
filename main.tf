@@ -153,7 +153,7 @@ module "ec2_mgmt" {
   vpc_security_group_ids = ["${aws_security_group.mgmt-sg.id}"]
   subnet_ids             = "${module.vpc.public_subnets}"
 
-  uder_data              = "${data.template_file.script.rendered}"
+  user_data              = "${data.template_file.script.rendered}"
 
   tags = {
     Terraform   = "true"
