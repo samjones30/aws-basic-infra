@@ -136,19 +136,7 @@ locals {
 ########################
 
 data "template_file" "script" {
-  template = "${file(scripts/cloud_init.tpl")}"
-}
-
-data "template_cloudinit_config" "config" {
-  gzip          = true
-  base64_encode = true
-
-  # Main cloud-config configuration file.
-  part {
-    filename     = "init.cfg"
-    content_type = "text/cloud-config"
-    content      = "${data.template_file.script.rendered}"
-  }
+  template = "${file("scripts/cloud_init.tpl")}"
 }
 
 module "ec2_mgmt" {
@@ -165,7 +153,7 @@ module "ec2_mgmt" {
   vpc_security_group_ids = ["${aws_security_group.mgmt-sg.id}"]
   subnet_ids             = "${module.vpc.public_subnets}"
 
-  uder_data_base64       = "${data.template_cloudinit_config.config.rendered}"
+  uder_data              = "${data.template_file.script.rendered}"
 
   tags = {
     Terraform   = "true"
