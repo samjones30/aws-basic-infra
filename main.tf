@@ -152,6 +152,7 @@ module "ec2_mgmt" {
   monitoring             = true
   vpc_security_group_ids = ["${aws_security_group.mgmt-sg.id}"]
   subnet_ids             = "${module.vpc.public_subnets}"
+  iam_instance_profile	 = "${aws_iam_instance_profile.mgmt_role_profile.name}"
 
   user_data              = "${data.template_file.script.rendered}"
 
@@ -161,7 +162,36 @@ module "ec2_mgmt" {
   }
 }
 
+resource "aws_iam_instance_profile" "mgmt_role_profile" {
+  name = "mgmt_role_profile"
+  role = "${aws_iam_role.mgmt_role.name}"
+}
 
+##IAM role for MGMT servers
+resource "aws_iam_role" "mgmt_role" {
+  name = "mgmt_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_instance_profile" "test_profile" {
+  name = "test_profile"
+  role = "${aws_iam_role.role.name}"
+}
 
 resource "aws_security_group" "mgmt-sg" {
   name        = "mgmt-server-sg"
