@@ -204,16 +204,14 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "test-attach" {
-  role       = "${aws_iam_role.mgmt_role.name}"
-  policy_arn = "${aws_iam_policy.mgmt_policy.arn}"
+  role       = aws_iam_role.mgmt_role.name
+  policy_arn = aws_iam_policy.mgmt_policy.arn
 }
 
 resource "aws_iam_instance_profile" "mgmt_role_profile" {
   name = "mgmt_role_profile"
   role = aws_iam_role.mgmt_role.name
 }
-
-
 
 resource "aws_security_group" "mgmt-sg" {
   name        = "mgmt-server-sg"
@@ -267,6 +265,7 @@ module "ec2_cluster" {
   tags = {
     Terraform   = "true"
     Environment = "dev"
+    type        = "web-server"
   }
 }
 
