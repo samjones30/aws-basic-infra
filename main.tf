@@ -316,7 +316,7 @@ module "elb_http" {
   name = "web-lb"
   load_balancer_type = "application"
 
-  vpc_id	  = module.vpc.id
+  vpc_id	  = module.vpc.vpc_id
   subnets         = module.vpc.public_subnets
   security_groups = ["${aws_security_group.web-lb-sg.id}"]
   internal        = false
