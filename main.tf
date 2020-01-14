@@ -347,6 +347,7 @@ module "elb_http" {
         protocol            = "HTTP"
         matcher             = "200-399"
       }
+    }
   ]
 
   tags = {
