@@ -310,45 +310,35 @@ resource "aws_security_group" "web-sg" {
 #########################
 
 module "elb_http" {
-  source  = "terraform-aws-modules/alb/aws"
-  version = "~> 5.0"
+  source  = "terraform-aws-modules/elb/aws"
+  version = "~> 2.0"
 
   name = "web-lb"
-  load_balancer_type = "application"
 
-  vpc_id	  = module.vpc.vpc_id
   subnets         = module.vpc.public_subnets
   security_groups = ["${aws_security_group.web-lb-sg.id}"]
   internal        = false
 
-  http_tcp_listeners = [
+  listener = [
     {
-      port               = 80
-      protocol           = "HTTP"
-      target_group_index = 0
+      instance_port     = "80"
+      instance_protocol = "HTTP"
+      lb_port           = "80"
+      lb_protocol       = "HTTP"
     }
   ]
 
-  target_groups = [
-    {
-      name_prefix          = "web"
-      backend_protocol     = "HTTP"
-      backend_port         = 80
-      target_type          = "instance"
-      deregistration_delay = 10
-      health_check = {
-        enabled             = false
-        interval            = 30
-        path                = "/healthz"
-        port                = "traffic-port"
-        healthy_threshold   = 3
-        unhealthy_threshold = 3
-        timeout             = 6
-        protocol            = "HTTP"
-        matcher             = "200-399"
-      }
-    }
-  ]
+  health_check = {
+    target              = "HTTP:80/"
+    interval            = 30
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+  }
+
+  // ELB attachments
+  number_of_instances = "${var.ec2_web_instances}"
+  instances           = module.ec2_cluster.id
 
   tags = {
     Name      = "web-lb"
