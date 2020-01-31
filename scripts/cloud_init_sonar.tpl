@@ -11,3 +11,6 @@ packages:
   - zip
   - yum-utils
   - java-11-openjdk-devel
+
+  runcmd:
+    - amazon-linux-extras install postgresql10

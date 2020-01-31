@@ -161,7 +161,7 @@ module "sonar_rds" {
 
   iam_database_authentication_enabled = true
 
-  vpc_security_group_ids = ["${aws_security_group.mgmt-sg.id}"]
+  vpc_security_group_ids = ["${aws_security_group.db-sg.id}"]
 
   maintenance_window = "Mon:00:00-Mon:03:00"
   backup_window      = "03:00-06:00"
