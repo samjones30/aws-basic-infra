@@ -152,7 +152,7 @@ module "sonar_rds" {
   engine            = "postgres"
   engine_version    = "10.10"
   instance_class    = var.sonarqube_rds_size
-  allocated_storage = 5
+  allocated_storage = 20
 
   name     = "sonarqube"
   username = "sonarqube"
@@ -177,8 +177,8 @@ module "sonar_rds" {
     Name        = "sonarqube_rds"
   }
 
-  family = "postgres10.10"
-  major_engine_version = "10.10"
+  family = "postgres10"
+  major_engine_version = "10"
   deletion_protection = false
 }
 
@@ -222,7 +222,7 @@ module "ec2_sonarqube" {
   version                = "~> 2.0"
 
   name                   = "sonarqube-server"
-  instance_count         = "${var.ec2_sonarqube_instances}"
+    instance_count         = "${var.ec2_sonarqube_instances}"
 
   ami                    = "${data.aws_ami.aws_linux_ami.id}"
   instance_type          = "${var.ec2_sonarqube_instance_type}"
