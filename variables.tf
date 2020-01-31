@@ -15,6 +15,14 @@ variable "public_subnet1_cidr" {
   default = "10.2.0.0/24"
 }
 
+variable "database_subnet2_cidr" {
+  default = "10.2.2.0/24"
+}
+
+variable "database_subnet1_cidr" {
+  default = "10.2.3.0/24"
+}
+
 variable "cidr_internet" {
   default = "0.0.0.0/0"
 }
@@ -40,5 +48,20 @@ variable "ec2_web_instance_type" {
 }
 
 variable "ec2_mgmt_instance_type" {
+  default = "t2.micro"
+}
+
+variable "sonarqube_rds_password" {
+}
+
+variable "sonarqube_rds_size" {
+  default = "t2.micro"
+}
+
+variable "ec2_sonarqube_instances" {
+  default = "1"
+}
+
+variable "ec2_sonarqube_instance_type" {
   default = "t2.micro"
 }
