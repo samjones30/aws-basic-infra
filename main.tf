@@ -182,6 +182,31 @@ module "sonar_rds" {
   deletion_protection = false
 }
 
+resource "aws_security_group" "db-sg" {
+  name        = "db-server-sg"
+  description = "Allow incoming db connections."
+  vpc_id      = module.vpc.vpc_id
+
+  depends_on = [aws_security_group.mgmt-sg]
+
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    security_groups = ["${aws_security_group.mgmt-sg.id}"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["${var.cidr_internet}"]
+  }
+  tags = {
+    Name      = "Database SG"
+    Terraform = true
+  }
+}
+
 ########################
 ###Create EC2 Servers###
 ########################
@@ -466,7 +491,7 @@ resource "aws_sns_topic" "status_updates" {
 }
 
 resource "aws_sns_topic_subscription" "status_updates_sqs_target" {
-  topic_arn = "${aws_sns_topic.status_updates.arn}"
+  topic_arn = aws_sns_topic.status_updates.arn
   protocol  = "sqs"
-  endpoint  = "${aws_sqs_queue.status_queue.arn}"
+  endpoint  = aws_sqs_queue.status_queue.arn
 }
