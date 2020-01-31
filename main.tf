@@ -167,7 +167,7 @@ module "sonar_rds" {
   backup_window      = "03:00-06:00"
 
   # DB subnet group
-  subnet_ids = ["${module.vpc.database_subnets}"]
+  subnet_ids = module.vpc.database_subnets
 
   backup_retention_period = 0
 
