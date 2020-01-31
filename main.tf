@@ -186,11 +186,11 @@ module "sonar_rds" {
 ###Create EC2 Servers###
 ########################
 
-data "template_file_mgmt" "script" {
+data "template_file" "script_mgmt" {
   template = "${file("scripts/cloud_init_mgmt.tpl")}"
 }
 
-data "template_file_sonar" "script" {
+data "template_file" "script_sonar" {
   template = "${file("scripts/cloud_init_sonar.tpl")}"
 }
 
@@ -209,7 +209,7 @@ module "ec2_mgmt" {
   subnet_ids             = "${module.vpc.public_subnets}"
   iam_instance_profile	 = "${aws_iam_instance_profile.mgmt_role_profile.name}"
 
-  user_data              = "${data.template_file_mgmt.script.rendered}"
+  user_data              = "${data.template_file.script_mgmt.rendered}"
 
   tags = {
     Terraform   = "true"
@@ -232,7 +232,7 @@ module "ec2_sonarqube" {
   subnet_ids             = "${module.vpc.public_subnets}"
   iam_instance_profile	 = "${aws_iam_instance_profile.mgmt_role_profile.name}"
 
-  user_data              = "${data.template_file_sonar.script.rendered}"
+  user_data              = "${data.template_file.script_sonar.rendered}"
 
   tags = {
     Terraform   = "true"
