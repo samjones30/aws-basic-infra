@@ -55,7 +55,7 @@ variable "sonarqube_rds_password" {
 }
 
 variable "sonarqube_rds_size" {
-  default = "t2.micro"
+  default = "db.t2.micro"
 }
 
 variable "ec2_sonarqube_instances" {
