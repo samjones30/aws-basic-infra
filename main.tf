@@ -37,24 +37,27 @@ data "aws_caller_identity" "current" {}
 ##################################
 
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+  source                = "terraform-aws-modules/vpc/aws"
 
-  name = "infra-training-vpc"
-  cidr = "${var.vpc_cidr}"
+  name                  = "infra-training-vpc"
+  cidr                  = "${var.vpc_cidr}"
 
-  azs             = ["${var.aws_region}a", "${var.aws_region}b"]
-  public_subnets  = ["${var.public_subnet1_cidr}", "${var.public_subnet2_cidr}"]
+  azs                   = ["${var.aws_region}a", "${var.aws_region}b"]
+  public_subnets        = ["${var.public_subnet1_cidr}", "${var.public_subnet2_cidr}"]
+  database_subnets      = ["${var.database_subnet1_cidr}", "${var.database_subnet2_cidr}"]
 
-  enable_dns_hostnames = true
-  instance_tenancy     = "default"
-  enable_dns_support   = true
+  enable_dns_hostnames  = true
+  instance_tenancy      = "default"
+  enable_dns_support    = true
 
-  public_dedicated_network_acl     = true
+  public_dedicated_network_acl    = true
   public_inbound_acl_rules        = concat(
     local.network_acls["default_inbound"],
     local.network_acls["public_inbound"],
   )
   public_outbound_acl_rules       = local.network_acls["default_outbound"]
+
+  create_database_subnet_group = false
 
   tags = {
     Terraform = "true"
@@ -63,6 +66,11 @@ module "vpc" {
 
   public_subnet_tags = {
     Name = "public-subnet-webs"
+    Terraform = "true"
+  }
+
+  database_subnet_tags = {
+    Name = "private-subnet-dbs"
     Terraform = "true"
   }
 
@@ -132,11 +140,58 @@ locals {
 
 
 ########################
+###Create RDS servers###
+########################
+
+module "sonar_rds" {
+  source  = "terraform-aws-modules/rds/aws"
+  version = "~> 2.0"
+
+  identifier = "sonarqube"
+
+  engine            = "postgres"
+  engine_version    = "10.10"
+  instance_class    = var.sonarqube_rds_size
+  allocated_storage = 5
+
+  name     = "sonarqube"
+  username = "sonarqube"
+  password = var.sonarqube_rds_password
+  port     = "3306"
+
+  iam_database_authentication_enabled = true
+
+  vpc_security_group_ids = ["${aws_security_group.mgmt-sg.id}"]
+
+  maintenance_window = "Mon:00:00-Mon:03:00"
+  backup_window      = "03:00-06:00"
+
+  # DB subnet group
+  subnet_ids = module.vpc.database_subnets
+
+  backup_retention_period = 0
+
+  tags = {
+    Terraform   = "true"
+    Environment = "dev"
+    Name        = "sonarqube_rds"
+  }
+
+  family = "postgres10.10"
+  major_engine_version = "10.10"
+  deletion_protection = false
+}
+
+########################
 ###Create EC2 Servers###
 ########################
 
-data "template_file" "script" {
-  template = "${file("scripts/cloud_init.tpl")}"
+data "template_file" "script_mgmt" {
+  template = "${file("scripts/cloud_init_mgmt.tpl")}"
+}
+
+data "template_file" "script_sonar" {
+  template = "${file("scripts/cloud_init_sonar.tpl")}"
 }
 
 module "ec2_mgmt" {
@@ -154,7 +209,30 @@ module "ec2_mgmt" {
   subnet_ids             = "${module.vpc.public_subnets}"
   iam_instance_profile	 = "${aws_iam_instance_profile.mgmt_role_profile.name}"
 
-  user_data              = "${data.template_file.script.rendered}"
+  user_data              = "${data.template_file.script_mgmt.rendered}"
+
+  tags = {
+    Terraform   = "true"
+    Environment = "dev"
+  }
+}
+
+module "ec2_sonarqube" {
+  source                 = "terraform-aws-modules/ec2-instance/aws"
+  version                = "~> 2.0"
+
+  name                   = "sonarqube-server"
+  instance_count         = "${var.ec2_sonarqube_instances}"
+
+  ami                    = "${data.aws_ami.aws_linux_ami.id}"
+  instance_type          = "${var.ec2_sonarqube_instance_type}"
+  key_name               = "${var.aws_key_name-mgmt}"
+  monitoring             = true
+  vpc_security_group_ids = ["${aws_security_group.mgmt-sg.id}"]
+  subnet_ids             = "${module.vpc.public_subnets}"
+  iam_instance_profile	 = "${aws_iam_instance_profile.mgmt_role_profile.name}"
+
+  user_data              = "${data.template_file.script_sonar.rendered}"
 
   tags = {
     Terraform   = "true"
