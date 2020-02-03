@@ -236,6 +236,12 @@ resource "aws_security_group" "mgmt-sg" {
     protocol    = "icmp"
     cidr_blocks = ["${var.cidr_internet}"]
   }
+  ingress {
+    from_port   = 9000
+    to_port     = 9000
+    protocol    = "tcp"
+    cidr_blocks = ["${var.cidr_internet}"]
+  }
   egress {
     from_port   = 0
     to_port     = 0
