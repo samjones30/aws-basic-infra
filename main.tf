@@ -357,6 +357,49 @@ resource "aws_security_group" "mgmt-sg" {
   }
 }
 
+module "ec2_jenkins_slaves" {
+  source                 = "terraform-aws-modules/ec2-instance/aws"
+  version                = "~> 2.0"
+
+  name                   = "jenkins-slaves"
+  instance_count         = "${var.ec2_jenkins_slave_instances}"
+
+  ami                    = "${data.aws_ami.aws_linux_ami.id}"
+  instance_type          = "${var.ec2_jenkins_slave_instance_type}"
+  key_name               = "${var.aws_key_name-mgmt}"
+  monitoring             = true
+  vpc_security_group_ids = ["${aws_security_group.jenkins-slaves-sg.id}"]
+  subnet_ids             = "${module.vpc.public_subnets}"
+
+  tags = {
+    Terraform   = "true"
+    Environment = "dev"
+  }
+}
+
+resource "aws_security_group" "jenkins-slaves-sg" {
+  name        = "jenkins-slave-sg"
+  description = "Allow incoming Jenkins connections from master."
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    security_groups = ["${aws_security_group.mgmt-sg.id}"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["${var.cidr_internet}"]
+  }
+  tags = {
+    Name      = "Jenkins slaves SG"
+    Terraform = true
+  }
+}
+
 module "ec2_cluster" {
   source                 = "terraform-aws-modules/ec2-instance/aws"
   version                = "~> 2.0"
