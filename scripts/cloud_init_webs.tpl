@@ -10,6 +10,7 @@ packages:
   - httpd
 
 runcmd:
-  - git clone https://github.com/cloudacademy/static-website-example.git /var/www
+  - git clone https://github.com/cloudacademy/static-website-example.git /tmp/www
+  - cp -r /tmp/www/* /var/www
   - sudo systemctl start httpd
   - sudo systemctl enable httpd
