@@ -36,7 +36,7 @@ variable "aws_key_name-servers" {
 }
 
 variable "ec2_web_instances" {
-  default = "1"
+  default = "2"
 }
 
 variable "ec2_mgmt_instances" {
@@ -59,7 +59,7 @@ variable "sonarqube_rds_size" {
 }
 
 variable "ec2_sonarqube_instances" {
-  default = "1"
+  default = "0"
 }
 
 variable "ec2_sonarqube_instance_type" {
