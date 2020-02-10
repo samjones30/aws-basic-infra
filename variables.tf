@@ -65,3 +65,11 @@ variable "ec2_sonarqube_instances" {
 variable "ec2_sonarqube_instance_type" {
   default = "t2.micro"
 }
+
+variable "ec2_jenkins_slave_instances" {
+  default = "0"
+}
+
+variable "ec2_jenkins_slave_instance_type" {
+  default = "t2.micro"
+}
