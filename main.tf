@@ -219,6 +219,10 @@ data "template_file" "script_sonar" {
   template = "${file("scripts/cloud_init_sonar.tpl")}"
 }
 
+data "template_file" "script_webs" {
+  template = "${file("scripts/cloud_init_webs.tpl")}"
+}
+
 module "ec2_mgmt" {
   source                 = "terraform-aws-modules/ec2-instance/aws"
   version                = "~> 2.0"
@@ -413,6 +417,8 @@ module "ec2_cluster" {
   monitoring             = true
   vpc_security_group_ids = ["${aws_security_group.web-sg.id}"]
   subnet_ids              = "${module.vpc.public_subnets}"
+
+  user_data              = "${data.template_file.script_webs.rendered}"
 
   tags = {
     Terraform   = "true"
