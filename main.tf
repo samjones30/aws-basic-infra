@@ -143,44 +143,44 @@ locals {
 ###Create RDS servers###
 ########################
 
-module "sonar_rds" {
-  source  = "terraform-aws-modules/rds/aws"
-  version = "~> 2.0"
-
-  identifier = "sonarqube"
-
-  engine            = "postgres"
-  engine_version    = "10.10"
-  instance_class    = var.sonarqube_rds_size
-  allocated_storage = 20
-
-  name     = "sonarqube"
-  username = "sonarqube"
-  password = var.sonarqube_rds_password
-  port     = "3306"
-
-  iam_database_authentication_enabled = true
-
-  vpc_security_group_ids = ["${aws_security_group.db-sg.id}"]
-
-  maintenance_window = "Mon:00:00-Mon:03:00"
-  backup_window      = "03:00-06:00"
-
-  # DB subnet group
-  subnet_ids = module.vpc.database_subnets
-
-  backup_retention_period = 0
-
-  tags = {
-    Terraform   = "true"
-    Environment = "dev"
-    Name        = "sonarqube_rds"
-  }
-
-  family = "postgres10"
-  major_engine_version = "10"
-  deletion_protection = false
-}
+#module "sonar_rds" {
+#  source  = "terraform-aws-modules/rds/aws"
+#  version = "~> 2.0"
+#
+#  identifier = "sonarqube"
+#
+#  engine            = "postgres"
+#  engine_version    = "10.10"
+#  instance_class    = var.sonarqube_rds_size
+#  allocated_storage = 20
+#
+#  name     = "sonarqube"
+#  username = "sonarqube"
+#  password = var.sonarqube_rds_password
+#  port     = "3306"
+#
+#  iam_database_authentication_enabled = true
+#
+#  vpc_security_group_ids = ["${aws_security_group.db-sg.id}"]
+#
+#  maintenance_window = "Mon:00:00-Mon:03:00"
+#  backup_window      = "03:00-06:00"
+#
+#  # DB subnet group
+#  subnet_ids = module.vpc.database_subnets
+#
+#  backup_retention_period = 0
+#
+#  tags = {
+#    Terraform   = "true"
+#    Environment = "dev"
+#    Name        = "sonarqube_rds"
+#  }
+#
+#  family = "postgres10"
+#  major_engine_version = "10"
+#  deletion_protection = false
+#}
 
 resource "aws_security_group" "db-sg" {
   name        = "db-server-sg"
@@ -328,6 +328,12 @@ resource "aws_security_group" "mgmt-sg" {
   ingress {
     from_port   = 8080
     to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["${var.cidr_internet}"]
+  }
+  ingress {
+    from_port   = 9090
+    to_port     = 9090
     protocol    = "tcp"
     cidr_blocks = ["${var.cidr_internet}"]
   }

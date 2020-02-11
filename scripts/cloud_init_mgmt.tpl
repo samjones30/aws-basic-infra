@@ -29,5 +29,6 @@ runcmd:
   - git clone https://github.com/wardviaene/jenkins-course.git /home/ec2-user/jenkins-course
   - git clone https://github.com/samjones30/sonar.git /home/ec2-user/ansible/roles/sonar
   - aws ec2 describe-instances --region eu-west-2 --filters "Name=tag:type,Values=web-server" --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text >> /home/ec2-user/web-servers.txt
-  - curl -O /opt/prometheus https://github.com/prometheus/prometheus/releases/download/v2.16.0-rc.1/prometheus-2.16.0-rc.1.linux-amd64.tar.gz
-  - tar xvfz /opt/prometheus/prometheus-*.tar.gz
+  - wget -O /opt/prometheus.tar.gz https://github.com/prometheus/prometheus/releases/download/v2.16.0-rc.1/prometheus-2.16.0-rc.1.linux-amd64.tar.gz
+  - tar xvfz /opt/prometheus.tar.gz ; mv /opt/prometheus-2.16.0-rc.1.linux-amd64 /opt/prometheus
+  - ./opt/prometheus/prometheus --config.file=prometheus.yml &
